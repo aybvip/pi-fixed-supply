@@ -1,0 +1,41 @@
+name: self-test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Daily, so that a change in the chain is noticed without anyone looking.
+    - cron: "17 6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Offline unit tests (no network)
+        run: node examples/self-test.mjs --offline
+
+      - name: Decode the raw header and cross-check the API
+        run: node examples/xdr-header.mjs
+
+      - name: Sweep the observable range for the supply cap
+        run: node examples/supply-check.mjs --samples 40
+
+      - name: Check the operation vocabulary for issuance
+        run: node examples/op-check.mjs
+
+      - name: Full suite
+        run: node examples/run-all.mjs

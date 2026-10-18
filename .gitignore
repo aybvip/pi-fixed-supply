@@ -1,0 +1,23 @@
+# --- build output ---------------------------------------------------------
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+
+# --- dependencies ---------------------------------------------------------
+node_modules/
+vendor/
+.bundle/
+
+# --- OS / editor ----------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# --- scratch (never commit these) -----------------------------------------
+# commit-message files and throwaway probes used while working on this repo
+_msg.txt
+_*.mjs
+_*.txt

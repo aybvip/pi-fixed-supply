@@ -1,0 +1,61 @@
+title: pi-fixed-supply
+tagline: "Pi's total native supply is fixed at 100,000,000,000 π on every observable ledger"
+description: >-
+  A read-only, zero-dependency proof that Pi Mainnet's total native supply is exactly
+  100,000,000,000 π on every observable ledger, and that no operation in the network's
+  current protocol increases it. Nothing is claimed about circulating supply, allocation,
+  unlock schedules, price, or any future protocol change.
+
+author: aybvip
+
+# GitHub Pages project site
+url: "https://aybvip.github.io"
+baseurl: "/pi-fixed-supply"
+
+repository: aybvip/pi-fixed-supply
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+plugins:
+  - jekyll-relative-links
+  - jekyll-sitemap
+
+relative_links:
+  enabled: true
+  collections: true
+
+# Any page that does not declare its own title gets one from its first H1.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Clipboard-only files and build scaffolding — keep them out of the site.
+exclude:
+  - .gitignore
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - LICENSE
+  - CITATION.cff
+  - .github
+
+nav:
+  - title: Proof
+    url: /PROOF.html
+  - title: Scope
+    url: /docs/SCOPE.html
+  - title: Sources
+    url: /docs/SOURCES.html
+  - title: Falsify
+    url: /docs/FALSIFICATION.html
+  - title: Verify
+    url: /docs/VERIFICATION.html
+  - title: Objections
+    url: /docs/FAQ-ALL-OBJECTIONS.html
+  - title: Audit request
+    url: /docs/AUDIT-REQUEST.html

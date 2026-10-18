@@ -1,0 +1,98 @@
+# pi-fixed-supply
+
+> Pi's total native supply is exactly 100,000,000,000 π on every observable ledger, and no operation
+> in the network's current protocol increases it.
+
+Repository: https://github.com/aybvip/pi-fixed-supply
+Site:       https://aybvip.github.io/pi-fixed-supply/
+Licence:    MIT (code and text). Quoted Pi Network / Stellar documentation belongs to its authors.
+Status:     self-tested; NOT independently audited.
+
+## What is claimed
+
+- Claim A (proven): Pi Mainnet's TOTAL native supply is fixed at 100,000,000,000 π on every observable
+  ledger — from ledger 2 (2020-12-31T22:47:31Z) to the live head. Measured: 70 ledgers sampled across
+  the full range, 0 deviations from `total_coins = 100000000000.0000000`.
+- Claim B (verifiable): any single ledger's supply can be read from its raw consensus-signed
+  `header_xdr`, independently of the API's JSON summary. The decoder also reads `inflationSeq`, which
+  the JSON does not expose; it is 0.
+- Claim C (NOT claimed): circulating / "effective" supply, allocation, unlock schedules, price,
+  consensus. Pi defines Effective Total Supply separately as Migrated Mining Rewards / 65%.
+
+## What is NOT claimed
+
+- That circulating supply equals 100,000,000,000 π (it does not; that is a different, off-ledger figure).
+- That `total_coins` equals the sum of all account balances (it is a header field; no sum is claimed).
+- That the supply can never change under any future protocol. Pi's Whitepaper explicitly reserves the
+  question of future inflation for a later community decision. The claim is scoped to the CURRENT
+  protocol and the OBSERVABLE PRESENT.
+- Anything about ledgers before ledger 2: ledger 1 returns HTTP 410 Gone and is not served.
+- Anything about price, value, legality, or investment merit. Not financial advice.
+
+## Key facts
+
+- Documented maximum supply: 100,000,000,000 π (Pi Network blog, 2025-04-17; Pi Whitepaper, 2021-12-28).
+- 1 π = 10,000,000 stroops — derived from the chain: raw `totalCoins` = 1000000000000000000 stroops.
+- Ledger 2 (first observable): `total_coins` already at the cap; `fee_pool` = 0; `inflationSeq` = 0.
+- Ledger 1: HTTP 410 Gone (the lower bound of the claim).
+- `fee_pool` grows from 0.0000000 at genesis to about 11,780,946.9229664 at the head, while
+  `total_coins` never moves — a fee sink, not issuance.
+- Protocol versions seen across the sampled range: 0, 15, 18, 19, 21, 24, 25, 26, 28.
+- Several other header fields DID change over the same range (baseFee 100 -> 100000, baseReserve
+  100000000 -> 4900000, maxTxSetSize 100 -> 1000) while `totalCoins` and `inflationSeq` did not — so the
+  measurement is not blind.
+- Stellar removed the `inflation` operation — the protocol's only native-issuance operation — at
+  Protocol 12, on 2019-10-28, before Pi's genesis.
+
+## How to verify (read-only, GET only, zero dependencies, Node 18+)
+
+    node examples/run-all.mjs                 # everything, one verdict
+    node examples/xdr-header.mjs              # decode the raw header, cross-check the API
+    node examples/xdr-header.mjs 2            # the earliest observable ledger
+    node examples/supply-check.mjs --samples 40
+    node examples/op-check.mjs
+    node examples/self-test.mjs               # the test suite (~62 checks)
+    node examples/self-test.mjs --offline     # no network at all
+
+Without Node at all:
+
+    curl -s https://api.mainnet.minepi.com/ledgers/2 | grep -o '"total_coins":"[^"]*"'
+    curl -s https://api.mainnet.minepi.com/ledgers?order=desc&limit=1 | grep -o '"total_coins":"[^"]*"'
+
+Both print "total_coins":"100000000000.0000000".
+
+## Falsifiers — how to prove this wrong
+
+- F1: a ledger whose `total_coins` is not exactly 100000000000.0000000.
+- F2: an operation that creates native π, or a transaction that raises `total_coins`.
+- F3: a ledger where the API's `total_coins` differs from the decoded raw `header_xdr`.
+- F4: a protocol change that re-enables native issuance (anticipated, not denied).
+- F5: a pre-genesis (ledger 1) signed header that disagrees.
+
+Only F1-F3 end the claim today. Objections about price, circulating supply, allocation or consensus are
+NOT falsifiers — they are answers to different questions.
+
+## Documents
+
+- README.md, PROOF.md, DISCLAIMER.md, CONTRIBUTING.md, SECURITY.md, CITATION.cff
+- docs/SCOPE.md            the exact claim, three levels, formal appendix
+- docs/SOURCES.md          every official source, verbatim, with revision pins
+- docs/FALSIFICATION.md    F1-F5, non-falsifiers, submission process
+- docs/VERIFICATION.md     the verification layers
+- docs/AUDIT-REQUEST.md    an open request to break the claim
+- docs/THREAT-MODEL.md     what is defended, what is not
+- docs/INDEX.md            the full map
+- docs/FAQ-INFINITE-MINT.md, FAQ-PREMINTED-AT-GENESIS.md, FAQ-TOTAL-VS-EFFECTIVE.md,
+  FAQ-API-COULD-LIE.md, FAQ-FEE-POOL.md, FAQ-FUTURE-INFLATION.md, FAQ-LEDGER-1-MISSING.md,
+  FAQ-ALL-OBJECTIONS.md
+
+## Sources (official only)
+
+- Pi Network, "Mainnet Migrations Roadmap & Tokenomics", 2025-04-17:
+  https://minepi.com/blog/mainnet-migrations-roadmap-and-tokenomics/
+- Pi Network Whitepaper, version dated 2021-12-28: https://minepi.com/white-paper/
+- Stellar Docs, "Ledger header fields" (updated 2026-05-27):
+  https://developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/ledgers
+- The chain itself: https://api.mainnet.minepi.com (read-only)
+
+Aggregators, exchanges, dashboards, social posts, forks and mirrors are NOT used as sources.

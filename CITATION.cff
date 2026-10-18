@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "pi-fixed-supply — Pi's total native supply is fixed at 100,000,000,000 π on every observable ledger"
+abstract: >-
+  A read-only, zero-dependency proof that Pi Mainnet's total native supply is exactly
+  100,000,000,000 π on every observable ledger, and that no operation in the network's current
+  protocol increases it. The claim is verified by decoding the raw consensus-signed ledger header
+  (including the issuance counter, which the public API does not expose), by sweeping the observable
+  ledger range for the documented cap, and by cross-checking the API's JSON summary against the
+  header it summarises. It proves nothing about circulating supply, allocation, unlock schedules,
+  price, or any future protocol change.
+type: software
+authors:
+  - family-names: aybvip
+    name-suffix: ""
+    website: "https://github.com/aybvip"
+repository-code: "https://github.com/aybvip/pi-fixed-supply"
+url: "https://aybvip.github.io/pi-fixed-supply/"
+license: MIT
+version: "1.0.0"
+date-released: "2026-10-18"
+keywords:
+  - Pi Network
+  - Pi Mainnet
+  - Stellar
+  - ledger header
+  - total supply
+  - maximum supply
+  - total_coins
+  - inflation
+  - Protocol 12
+  - fixed supply
+  - verification
+  - reproducibility
+  - falsifiability

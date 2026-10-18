@@ -1,0 +1,16 @@
+---
+layout: default
+---
+
+{% if page.faq_question %}
+<details class="faq" open>
+  <summary>{{ page.faq_question }}</summary>
+  <p style="margin:.7rem 0 0">{{ page.faq_answer }}</p>
+</details>
+{% endif %}
+
+{{ content }}
+
+<p style="margin-top:2rem;font-size:.9rem">
+  <a href="{{ site.baseurl }}/docs/FAQ-ALL-OBJECTIONS.html">← Every objection, in one table</a>
+</p>
