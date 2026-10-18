@@ -21,7 +21,7 @@ retrieved and cross-checked on **2026-10-18**.
 | S1 | **Pi Network** — blog, *Mainnet Migrations Roadmap & Tokenomics* | `minepi.com/blog/mainnet-migrations-roadmap-and-tokenomics/` | published **2025-04-17** |
 | S2 | **Pi Network** — Whitepaper (Mainnet chapter) | `minepi.com/white-paper/` | version dated **2021-12-28** |
 | S3 | **Stellar Docs** — *Ledger header fields* | `developers.stellar.org/docs/learn/fundamentals/stellar-data-structures/ledgers` | page updated **2026-05-27** |
-| S4 | **Pi Mainnet API** (the chain itself) | `api.mainnet.minepi.com` | live head at retrieval: ledger **29,284,239**, closed **2026-10-18T20:15:10Z** |
+| S4 | **Pi Mainnet API** (the chain itself) | `api.mainnet.minepi.com` | live head at retrieval: ledger **29,284,884**, closed **2026-10-18T21:08:55Z** |
 
 The API is listed as a source on purpose. Four of the claims here are **measured**, not quoted, and the
 measurement is the primary evidence.
@@ -89,9 +89,9 @@ And the sentence that sets the honest upper bound on this repository’s claim:
 > reach a conclusion on the matter in a decentralized way.”
 
 > ⚠️ **Read that last paragraph carefully.** Pi reserves the *right to consider* future inflation, to be
-> decided by the community. This is exactly why the claim here is worded **“no operation in the
-> network’s current protocol increases it”** and **“on every observable ledger”** — not “the supply can
-> never change”. See `docs/FAQ-FUTURE-INFLATION.md`.
+> decided by the community. This is exactly why the claim here is worded as a statement about the
+> **observable present** — “every ledger header examined” — and not as “the supply can never change”.
+> See `docs/FAQ-FUTURE-INFLATION.md`.
 
 ---
 
@@ -131,10 +131,10 @@ The public Pi Mainnet API, `https://api.mainnet.minepi.com`, read-only (GET only
 |---|---|
 | Earliest ledger served | **2** — closed **2020-12-31T22:47:31Z**; `total_coins = 100000000000.0000000` |
 | Ledger 1 | **not served** — HTTP `410 Gone` |
-| Live head at retrieval | **29,284,239** — closed **2026-10-18T20:15:10Z**; `total_coins = 100000000000.0000000` |
+| Live head at retrieval | **29,284,884** — closed **2026-10-18T21:08:55Z**; `total_coins = 100000000000.0000000` |
 | Ledgers sampled across the full range | **70** — **0** deviations from the cap |
 | `fee_pool` at ledger 2 | `0.0000000` |
-| `fee_pool` at the head | `11780946.9229664` — monotonically increasing |
+| `fee_pool` at the head | `11781341.5131664` — monotonically increasing |
 | Protocol versions in the sampled range | `0, 15, 18, 19, 21, 24, 25, 26, 28` |
 | `inflationSeq` (decoded from raw XDR) | **0** |
 | `totalCoins` (decoded from raw XDR) | **1000000000000000000** stroops = 100,000,000,000 π |

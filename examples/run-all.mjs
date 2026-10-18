@@ -18,6 +18,7 @@ import { fileURLToPath } from "node:url";
 const STEPS = [
   ["check-links.mjs", [], "every relative link resolves from its own file"],
   ["xdr-header.mjs", [], "the raw header decodes and matches the API's JSON"],
+  ["hash-chain.mjs", ["--count", "12"], "the raw headers hash to their ledger hashes and chain by SHA-256"],
   ["supply-check.mjs", ["--samples", "30"], "total_coins is the cap on every sampled ledger"],
   ["op-check.mjs", ["--ledgers", "10", "--per", "20"], "no issuance-looking operation type exists"],
   ["self-test.mjs", [], "the suite's own tests"],

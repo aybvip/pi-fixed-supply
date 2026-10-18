@@ -3,13 +3,13 @@
 # this file is generated evidence — do not edit by hand
 
 OFFLINE — pure functions, XDR reader, failure paths
-......................................................
+..............................................................
 
 ONLINE — live assertions against Pi Mainnet (GET only)
-........
+..........
 
 ──────────────────────────────────────────────────────────────────────────
-  checks passed : 62/62   (54 offline, 8 online)
+  checks passed : 72/72   (62 offline, 10 online)
   ✅ all checks passed
 ──────────────────────────────────────────────────────────────────────────
 

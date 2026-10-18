@@ -4,14 +4,14 @@
 
 🔎  Operation vocabulary — what does the network actually do?
 --------------------------------------------------------------------------
-  sampling 42 ledgers across [2, 29284248], up to 20 operations each
+  sampling 42 ledgers across [2, 29284886], up to 20 operations each
 
-  operations read      : 51
+  operations read      : 50
   distinct op types    : 4
 
-        22  create_account
-        16  payment
-         9  claim_claimable_balance
+        21  payment
+        20  create_account
+         5  claim_claimable_balance
          4  create_claimable_balance
 
 --------------------------------------------------------------------------

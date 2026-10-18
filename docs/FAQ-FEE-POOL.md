@@ -32,7 +32,7 @@ of balances and into the pool** — a transfer, not a mint.
 |---|---|---|---|
 | **2** (genesis) | 2020-12-31T22:47:31Z | `0.0000000` | `100000000000.0000000` |
 | 6,588,955 | 2023-01-07T11:28:50Z | `72456.8500100` | `100000000000.0000000` |
-| **29,284,239** (head) | 2026-10-18T20:15:10Z | `11780946.9229664` | `100000000000.0000000` |
+| **29,284,884** (head) | 2026-10-18T21:08:55Z | `11781341.5131664` | `100000000000.0000000` |
 
 The fee pool went from **zero** to **~11.78 million π** across the same ledgers on which the total did
 not move by a single stroop.
@@ -68,7 +68,7 @@ The fee pool only ever goes **up** in the samples, and there is no operation tha
 ```
          2  2020-12-31T22:47:31Z  fee_pool = 0.0000000
    6588955  2023-01-07T11:28:50Z  fee_pool = 72456.8500100  (+)
-  29284239  2026-10-18T20:15:10Z  fee_pool = 11780946.9229664  (+)
+  29284884  2026-10-18T21:08:55Z  fee_pool = 11781341.5131664  (+)
 ```
 
 A field that can only rise and is defined as “already paid” is a **sink**, not a source.

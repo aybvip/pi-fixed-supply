@@ -18,7 +18,8 @@
  * What it does NOT establish
  *   - circulating / "effective" supply. See docs/FAQ-TOTAL-VS-EFFECTIVE.md.
  *   - that the header is honest. See examples/xdr-header.mjs, which reads the
- *     same number out of the raw, consensus-signed header.
+ *     same number out of the raw header bytes, and examples/hash-chain.mjs,
+ *     which binds those bytes to the network with SHA-256.
  *
  * Read-only. GET only. Zero dependencies (Node 18+).
  *

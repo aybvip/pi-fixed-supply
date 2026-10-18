@@ -1,7 +1,9 @@
 # pi-fixed-supply
 
-> Pi's total native supply is exactly 100,000,000,000 π on every observable ledger, and no operation
-> in the network's current protocol increases it.
+> Every ledger header examined on Pi Mainnet reports 100,000,000,000 π, and the chain shows no issuance
+> operation — consistent with the documented protocol rule that removed native issuance before Pi's
+> genesis. This is a statement about the ledgers observed and the protocol version verified; it does not
+> mean 100 billion π is in circulation, and it does not claim a future protocol change is impossible.
 
 Repository: https://github.com/aybvip/pi-fixed-supply
 Site:       https://aybvip.github.io/pi-fixed-supply/
@@ -10,14 +12,18 @@ Status:     self-tested; NOT independently audited.
 
 ## What is claimed
 
-- Claim A (proven): Pi Mainnet's TOTAL native supply is fixed at 100,000,000,000 π on every observable
-  ledger — from ledger 2 (2020-12-31T22:47:31Z) to the live head. Measured: 70 ledgers sampled across
-  the full range, 0 deviations from `total_coins = 100000000000.0000000`.
-- Claim B (verifiable): any single ledger's supply can be read from its raw consensus-signed
-  `header_xdr`, independently of the API's JSON summary. The decoder also reads `inflationSeq`, which
-  the JSON does not expose; it is 0.
+- Claim A (measured): every ledger header examined reports `totalCoins` = 100,000,000,000 π — from
+  ledger 2 (2020-12-31T22:47:31Z) to the live head. Measured: 70 ledgers sampled across the full range,
+  0 deviations from `total_coins = 100000000000.0000000`.
+- Claim B (verifiable): any single ledger's supply can be read from its raw `header_xdr` bytes,
+  independently of the API's JSON summary, and those bytes are bound to the network locally with SHA-256
+  (`sha256(header)` = the ledger hash, and adjacent headers chained). The decoder also reads
+  `inflationSeq`, which the JSON does not expose; it is 0.
 - Claim C (NOT claimed): circulating / "effective" supply, allocation, unlock schedules, price,
   consensus. Pi defines Effective Total Supply separately as Migrated Mining Rewards / 65%.
+- Note: the SCP signature inside the header covers the StellarValue (txSetHash, closeTime, upgrades), NOT
+  `totalCoins`/`feePool`/`inflationSeq`. The binding to the network is the SHA-256 hash chain, not a
+  signature over the supply number.
 
 ## What is NOT claimed
 
@@ -49,9 +55,10 @@ Status:     self-tested; NOT independently audited.
     node examples/run-all.mjs                 # everything, one verdict
     node examples/xdr-header.mjs              # decode the raw header, cross-check the API
     node examples/xdr-header.mjs 2            # the earliest observable ledger
+    node examples/hash-chain.mjs              # hash the raw headers and verify the SHA-256 chain
     node examples/supply-check.mjs --samples 40
     node examples/op-check.mjs
-    node examples/self-test.mjs               # the test suite (~62 checks)
+    node examples/self-test.mjs               # the test suite (~72 checks)
     node examples/self-test.mjs --offline     # no network at all
 
 Without Node at all:
@@ -68,16 +75,17 @@ Both print "total_coins":"100000000000.0000000".
 - F3: a ledger where the API's `total_coins` differs from the decoded raw `header_xdr`.
 - F4: a protocol change that re-enables native issuance (anticipated, not denied).
 - F5: a pre-genesis (ledger 1) signed header that disagrees.
+- F6: a header whose bytes do not hash to its ledger hash, or a broken chain link.
 
-Only F1-F3 end the claim today. Objections about price, circulating supply, allocation or consensus are
-NOT falsifiers — they are answers to different questions.
+Only F1-F3 and F6 end the claim today. Objections about price, circulating supply, allocation or
+consensus are NOT falsifiers — they are answers to different questions.
 
 ## Documents
 
 - README.md, PROOF.md, DISCLAIMER.md, CONTRIBUTING.md, SECURITY.md, CITATION.cff
 - docs/SCOPE.md            the exact claim, three levels, formal appendix
 - docs/SOURCES.md          every official source, verbatim, with revision pins
-- docs/FALSIFICATION.md    F1-F5, non-falsifiers, submission process
+- docs/FALSIFICATION.md    F1-F6, non-falsifiers, submission process
 - docs/VERIFICATION.md     the verification layers
 - docs/AUDIT-REQUEST.md    an open request to break the claim
 - docs/THREAT-MODEL.md     what is defended, what is not

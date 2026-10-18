@@ -1,7 +1,7 @@
 ---
 layout: faq
 faq_question: "The Whitepaper says inflation may be needed later — so the supply is not really fixed."
-faq_answer: "Correct, and this repository says so up front rather than hiding it. Pi's Whitepaper reserves the question of future inflation for a later community decision. That is exactly why the claim is scoped to 'no operation in the network's current protocol' and 'on every observable ledger' — a statement about the measurable present, not a promise about eternity. A documented protocol change enabling issuance is listed as legitimate falsifier F4."
+faq_answer: "Correct, and this repository says so up front rather than hiding it. Pi's Whitepaper reserves the question of future inflation for a later community decision. That is exactly why the claim is scoped to 'every ledger header examined' and 'consistent with the documented rule' — a statement about the measurable present, not a promise about eternity. A documented protocol change enabling issuance is listed as legitimate falsifier F4."
 ---
 # FAQ — “The Whitepaper mentions future inflation”
 
@@ -15,8 +15,9 @@ faq_answer: "Correct, and this repository says so up front rather than hiding it
 **You are right, and the claim is written to survive exactly that.** This is the strongest honest
 objection to a naïvely worded supply claim, and it is why the wording here is narrow:
 
-> *“Pi’s total native supply is exactly 100,000,000,000 π on **every observable ledger**, and no
-> operation in the network’s **current protocol** increases it.”*
+> *“Every ledger header examined on Pi Mainnet reports **100,000,000,000 π**, and the chain shows no
+> issuance operation — consistent with the documented rule that removed native issuance before Pi’s
+> genesis.”*
 
 Not “the supply can never change”. Not “forever”. The **measured present**.
 
@@ -51,8 +52,8 @@ The claim has two clauses, and this objection touches only the second:
 
 | Clause | Scope | Status |
 |---|---|---|
-| “total native supply is exactly 100,000,000,000 π **on every observable ledger**” | the measurable present | ✅ proven by measurement |
-| “no operation in the network’s **current protocol** increases it” | today’s operation set | ✅ `inflationSeq = 0`; no issuance operation exists |
+| “every ledger header examined reports 100,000,000,000 π” | the measurable present | ✅ measured |
+| “the chain shows no issuance operation, consistent with the documented rule” | today’s operation set | ✅ documented + observed (`inflationSeq = 0`) |
 
 Both clauses are about **now**. Neither says anything about a future protocol the community has not
 adopted. If Pi later adopts a protocol that mints, **this repository becomes wrong about that clause and

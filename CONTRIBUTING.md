@@ -119,7 +119,7 @@ supply-check: sample 70 ledgers instead of 40
 
 Adds a denser logarithmic sweep over the first 10^3 ledgers, where a
 supply change would be cheapest to hide. 70 ledgers read, 0 deviations,
-range 2 .. 29284239.
+range 2 .. 29284884.
 ```
 
 ---

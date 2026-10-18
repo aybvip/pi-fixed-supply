@@ -1,10 +1,10 @@
 title: pi-fixed-supply
-tagline: "Pi's total native supply is fixed at 100,000,000,000 π on every observable ledger"
+tagline: "Pi's ledger headers report 100,000,000,000 π, and the chain shows no issuance"
 description: >-
-  A read-only, zero-dependency proof that Pi Mainnet's total native supply is exactly
-  100,000,000,000 π on every observable ledger, and that no operation in the network's
-  current protocol increases it. Nothing is claimed about circulating supply, allocation,
-  unlock schedules, price, or any future protocol change.
+  A read-only, zero-dependency measurement: every ledger header examined on Pi Mainnet reports
+  totalCoins = 100,000,000,000 π, and the chain shows no issuance operation — consistent with the
+  documented protocol rule that removed native issuance before Pi's genesis. Nothing is claimed about
+  circulating supply, allocation, unlock schedules, price, or any future protocol change.
 
 author: aybvip
 

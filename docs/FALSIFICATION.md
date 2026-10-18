@@ -13,8 +13,9 @@ title: "FALSIFICATION — how to prove this repository wrong"
 
 ## 0. The claim under attack
 
-> **“Pi’s total native supply is exactly 100,000,000,000 π on every observable ledger, and no operation
-> in the network’s current protocol increases it.”**
+> **“Every ledger header examined on Pi Mainnet reports `totalCoins` = 100,000,000,000 π, and the
+> chain shows no issuance operation and no increment of the issuance counter — consistent with the
+> documented protocol rule that removed native issuance before Pi’s genesis.”**
 
 Everything below is measured against that sentence. Nothing else in this repository needs to survive.
 
@@ -76,6 +77,19 @@ The public API does not serve ledger 1 (`410 Gone`). If you have an independent 
 archive, a signed header, a published checkpoint — and it disagrees, that materially changes the
 claim’s lower bound. See `docs/FAQ-LEDGER-1-MISSING.md`.
 
+### F6 — A header that does not hash to its ledger hash, or a broken chain link
+
+**Show a ledger whose `header_xdr` bytes do not satisfy `sha256(header) == hash`, or a header whose
+`previousLedgerHash` does not equal the SHA-256 of the previous header’s bytes.**
+
+Both are recomputed locally with `node:crypto`, with no value taken from the API. A break means the
+served bytes are not the ones the network’s hash chain commits to — which would falsify the “raw
+bytes” evidence this repository leans on, even if the reported supply figure were unchanged.
+
+```bash
+node examples/hash-chain.mjs
+```
+
 ---
 
 ## 2. What counts as a falsifier — and what does not
@@ -86,6 +100,7 @@ claim’s lower bound. See `docs/FAQ-LEDGER-1-MISSING.md`.
 | A transaction that raises `total_coins` | “Only a fraction has migrated to Mainnet.” (That is circulating supply — Claim C, never made here.) |
 | A header/JSON disagreement | “The Core Team has a large allocation.” (Disclosed; an allocation is not an issuance.) |
 | A published protocol change that enables issuance | “The fee pool keeps growing, so supply is growing.” (Fees are a separate header field — `docs/FAQ-FEE-POOL.md`.) |
+| A header that does not hash to its ledger hash, or a broken chain link | “Pi minted everything at genesis.” (Officially disclosed — `docs/SOURCES.md` §S1.) |
 | A signed header for ledger 1 that disagrees | “Pi minted everything at genesis.” (Officially disclosed — `docs/SOURCES.md` §S1.) |
 | — | “But there are only 100 billion, and Pi has users, so it is centralised.” (Different question.) |
 
@@ -104,6 +119,7 @@ circulating supply are answers to questions this repository does not ask.
 | **F3** header/JSON disagreement | 🟢 **not found** | Header decoded and cross-checked; all fields agree |
 | **F4** protocol change enabling issuance | ⚪ **open by design** | Reserved in Pi’s Whitepaper; the claim is worded to survive this |
 | **F5** pre-genesis discrepancy | ⚪ **unreachable** | Ledger 1 not served; lower bound is ledger 2 |
+| **F6** header not hashing to its ledger hash, or a broken chain link | 🟢 **not found** | `sha256(header)` = the ledger hash on every header walked; all links verified |
 
 `🟢 not found` means *sought and not found*, with the commands to re-sow the search. `⚪` means it is
 out of reach or deliberately open — not that it was tested and passed.
@@ -115,7 +131,7 @@ out of reach or deliberately open — not that it was tested and passed.
 Open a **GitHub issue** using the *falsifier* template (`.github/ISSUE_TEMPLATE/audit-finding.md`) and
 include:
 
-1. **Which falsifier** (F1–F5).
+1. **Which falsifier** (F1–F6).
 2. **The exact artifact** — a ledger sequence, a transaction hash, a header hash, or the document.
 3. **The raw response**, not a screenshot. A `curl` of the endpoint is ideal.
 4. **The command you ran**, so it can be reproduced byte for byte.

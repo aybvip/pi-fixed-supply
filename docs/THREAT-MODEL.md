@@ -42,7 +42,8 @@ So the adversary model is about **being wrong**, not about being robbed.
 | Threat | Mitigation in this repository |
 |---|---|
 | **A hidden issuance path** — some operation raises the total | The operation vocabulary is sampled (`op-check.mjs`); the header’s `inflationSeq` is read, not inferred; `total_coins` is measured on every sampled ledger |
-| **The API lies** about `total_coins` | The raw `header_xdr` is decoded and cross-checked field by field; a disagreement fails the run |
+| **The API lies** about `total_coins` | The raw `header_xdr` **bytes** are hashed and chained locally (`sha256(header)` = the ledger hash; adjacent headers committed to each other) and cross-checked against the JSON; a disagreement or a broken link fails the run |
+| **A fabricated header** | `sha256(header)` and every link are recomputed locally with `node:crypto` (`examples/chain.mjs`); a header that does not hash to its ledger hash is a finding (F6) |
 | **The decoder is silently wrong** | It is strict — short buffers, over-long length fields and unknown extensions all throw with offsets — and it is unit-tested offline against synthetic headers, including a signed `StellarValue` |
 | **A stale or wrong citation** | Every source is quoted verbatim and pinned by revision in `docs/SOURCES.md` §0 |
 | **Overclaiming in the prose** | `SCOPE.md` §4 lists what is **not** claimed, and `docs/FALSIFICATION.md` §2 separates real falsifiers from category errors |
@@ -55,8 +56,10 @@ So the adversary model is about **being wrong**, not about being robbed.
 
 Named so that a green run is not read as more than it is:
 
-- **A malicious or split node.** Whatever the node you query reports is what you measure. Querying
-  multiple independent endpoints reduces this; running your own node removes it.
+- **A malicious or split node.** Whatever the node you query reports is what you measure. The hash
+  chain (`examples/chain.mjs`) raises the cost of a lie — a fabricated header must arrive with a
+  self-consistent chain behind it, not a bare number — but the *anchor* hash still comes from the node
+  you query. Query multiple independent endpoints, or run your own node, to anchor it.
 - **A compromised machine.** If the host is owned, nothing here is meaningful.
 - **A supply-chain attack on Node itself.** The scripts use only the standard library, which limits the
   surface, but the runtime is trusted.

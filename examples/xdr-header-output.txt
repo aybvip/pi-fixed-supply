@@ -4,30 +4,30 @@
 
 🔎  Ledger header — decoded from the raw XDR
 --------------------------------------------------------------------------
-  ledger            : 29284247
-  closed_at         : 2026-10-18T20:15:50Z
-  header hash       : 6cc3bcf6b76e32250705f3adecb5ab8731ee3336ff8ceceb86802d8393da079d
+  ledger            : 29284883
+  closed_at         : 2026-10-18T21:08:50Z
+  header hash       : 71639dfbc2c07558246450a08f305d93f01053c6854537e14a533a14071b0a36
 
   raw header (decoded, not the API's summary)
     ledgerVersion   : 28
-    ledgerSeq       : 29284247
+    ledgerSeq       : 29284883
     totalCoins      : 1000000000000000000 stroops  =  100000000000.0000000 π
-    feePool         : 117809473529664 stroops  =  11780947.3529664 π
+    feePool         : 117813414931664 stroops  =  11781341.4931664 π
     inflationSeq    : 0   (issuance counter — JSON does not expose this)
     idPool          : 0
     baseFee         : 100000   baseReserve: 4900000   maxTxSetSize: 1000
     XDR consumed    : 428 of 428 bytes
 
   cross-check: raw XDR  vs  the API's JSON
-    ✓ ledgerSeq      xdr=29284247  json=29284247
+    ✓ ledgerSeq      xdr=29284883  json=29284883
     ✓ totalCoins     xdr=100000000000.0000000  json=100000000000.0000000
-    ✓ feePool        xdr=11780947.3529664  json=11780947.3529664
+    ✓ feePool        xdr=11781341.4931664  json=11781341.4931664
     ✓ maxTxSetSize   xdr=1000  json=1000
     ✓ baseFee        xdr=100000  json=100000
     ✓ baseReserve    xdr=4900000  json=4900000
     ✓ ledgerVersion  xdr=28  json=28
 --------------------------------------------------------------------------
-✅  The API's JSON matches the raw, consensus-signed header exactly.
+✅  The API's JSON matches the raw header bytes exactly.
     totalCoins = 100000000000.0000000 π — exactly the documented maximum supply.
     inflationSeq = 0 — the issuance operation has never run on this ledger.
 --------------------------------------------------------------------------

@@ -33,6 +33,7 @@ import {
   BASE,
 } from "./lib.mjs";
 import { XdrReader, xdrPad, decodeLedgerHeader } from "./xdr.mjs";
+import { sha256Hex, headerBytes, headerHashMatches, previousHashOf, verifyChain } from "./chain.mjs";
 
 const argv = process.argv.slice(2);
 if (argv.includes("--help") || argv.includes("-h")) {
@@ -124,6 +125,7 @@ const ZERO32 = () => Buffer.alloc(32);
 function buildHeader({
   ledgerVersion = 28,
   seq = 42,
+  prev = null,
   totalCoins = CAP_STROOPS,
   feePool = 123456789n,
   inflationSeq = 0,
@@ -138,7 +140,7 @@ function buildHeader({
 } = {}) {
   const parts = [];
   parts.push(beU32(ledgerVersion));
-  parts.push(ZERO32()); // previousLedgerHash
+  parts.push(prev ?? ZERO32()); // previousLedgerHash
   parts.push(ZERO32()); // scpValue.txSetHash
   parts.push(beU64(1792354230n)); // scpValue.closeTime
   parts.push(beU32(upgrades.length));
@@ -282,6 +284,52 @@ check("decode surfaces the public fields", () => {
   const h = decodeLedgerHeader(b64(buildHeader({ baseFee: 100000, baseReserve: 4900000, maxTxSetSize: 1000 })));
   return h.baseFee === 100000 && h.baseReserve === 4900000 && h.maxTxSetSize === 1000;
 });
+check("decode returns previousLedgerHash as hex", () => {
+  const h1 = buildHeader({ seq: 5 });
+  const hash1 = sha256Hex(h1);
+  const h2 = buildHeader({ seq: 6, prev: Buffer.from(hash1, "hex") });
+  return decodeLedgerHeader(b64(h2)).previousLedgerHash === hash1;
+});
+
+// --- chain.mjs (SHA-256 binding) --------------------------------------------
+check("sha256Hex matches the known SHA-256 of the empty string", () =>
+  sha256Hex(Buffer.alloc(0)) === "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+);
+check("sha256Hex matches the known SHA-256 of 'abc'", () =>
+  sha256Hex(Buffer.from("abc")) === "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+);
+check("headerHashMatches accepts the true hash and rejects a wrong one", () => {
+  const h = buildHeader({});
+  return headerHashMatches(b64(h), sha256Hex(h)) === true && headerHashMatches(b64(h), "0".repeat(64)) === false;
+});
+check("previousHashOf reads bytes 4..36", () =>
+  previousHashOf(b64(buildHeader({ prev: Buffer.alloc(32, 7) }))) === "07".repeat(32)
+);
+check("verifyChain accepts a well-linked pair", () => {
+  const h1 = buildHeader({ seq: 10 });
+  const h2 = buildHeader({ seq: 11, prev: Buffer.from(sha256Hex(h1), "hex") });
+  const r = verifyChain([
+    { sequence: 10, hash: sha256Hex(h1), header_xdr: b64(h1) },
+    { sequence: 11, hash: sha256Hex(h2), header_xdr: b64(h2) },
+  ]);
+  return r.ok === true && r.checks >= 3;
+});
+check("verifyChain rejects a tampered hash", () => {
+  const h1 = buildHeader({ seq: 10 });
+  const h2 = buildHeader({ seq: 11, prev: Buffer.from(sha256Hex(h1), "hex") });
+  return verifyChain([
+    { sequence: 10, hash: sha256Hex(h1), header_xdr: b64(h1) },
+    { sequence: 11, hash: "f".repeat(64), header_xdr: b64(h2) },
+  ]).ok === false;
+});
+check("verifyChain rejects a broken link", () => {
+  const h1 = buildHeader({ seq: 10 });
+  const h2 = buildHeader({ seq: 11, prev: ZERO32() }); // does not commit to h1
+  return verifyChain([
+    { sequence: 10, hash: sha256Hex(h1), header_xdr: b64(h1) },
+    { sequence: 11, hash: sha256Hex(h2), header_xdr: b64(h2) },
+  ]).ok === false;
+});
 
 // --- api() failure paths (injected transport, no network) --------------------
 await acheck("api() surfaces a network error", () =>
@@ -363,8 +411,15 @@ if (!OFFLINE_ONLY) {
   });
   await acheck("online: inflationSeq is 0 on the head ledger", () => decodeLedgerHeader(head.header_xdr).inflationSeq === 0);
   await acheck("online: totalCoins in the header IS the cap, in stroops", () => decodeLedgerHeader(head.header_xdr).totalCoins === CAP_STROOPS);
+  await acheck("online: sha256(raw header bytes) equals the ledger hash the API reports", () =>
+    sha256Hex(Buffer.from(head.header_xdr, "base64")) === head.hash
+  );
+  await acheck("online: consecutive headers are linked by SHA-256", async () => {
+    const prev = await api(`/ledgers/${Number(head.sequence) - 1}`);
+    return previousHashOf(head.header_xdr) === sha256Hex(Buffer.from(prev.header_xdr, "base64"));
+  });
 
-  onlineRun = 8;
+  onlineRun = 10;
 }
 
 // ---------------------------------------------------------------------------

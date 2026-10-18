@@ -1,7 +1,7 @@
 ---
 layout: faq
 faq_question: "Pi can mint unlimited coins — the supply is not capped."
-faq_answer: "It is capped, officially and on-chain. Pi documents a maximum supply of 100 billion π, and every observable ledger — from genesis (ledger 2, 2020-12-31) to the live head — reports total_coins of exactly 100000000000.0000000. The protocol's only native-issuance operation, inflation, was removed at Protocol 12 in 2019, before Pi's genesis, and the header's issuance counter reads 0."
+faq_answer: "It is capped, officially and on-chain. Pi documents a maximum supply of 100 billion π, and every ledger header examined — from genesis (ledger 2, 2020-12-31) to the live head — reports total_coins of exactly 100000000000.0000000. The protocol's only native-issuance operation, inflation, was removed at Protocol 12 in 2019, before Pi's genesis (as documented), and the header's issuance counter reads 0."
 ---
 # FAQ — “Pi can mint unlimited coins”
 
@@ -44,7 +44,7 @@ Two independent official documents, one number.
 |---|---|
 | Earliest ledger served | **2** (2020-12-31T22:47:31Z) |
 | `total_coins` there | `100000000000.0000000` |
-| Live head at retrieval | **29,284,239** (2026-10-18T20:15:10Z) |
+| Live head at retrieval | **29,284,884** (2026-10-18T21:08:55Z) |
 | `total_coins` there | `100000000000.0000000` |
 | Ledgers sampled across the whole range | **70** |
 | Ledgers **not** at the cap | **0** |

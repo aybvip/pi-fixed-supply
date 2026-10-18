@@ -5,10 +5,20 @@
  *
  * Why this exists: the API hands you `total_coins` as a JSON string, which
  * means you are trusting the API's summary of the ledger. The same response
- * also carries `header_xdr` — the raw, consensus-signed header — and this
- * module decodes it. Reading the number out of the raw header removes the API
- * from the trust path: if the JSON and the XDR disagree, this repository says
- * so and fails.
+ * also carries `header_xdr` — the ledger header as raw bytes — and this module
+ * decodes it. Reading the number straight out of those bytes makes the JSON
+ * summary a cross-check rather than a source: if the two disagree, this
+ * repository says so and fails.
+ *
+ * A note on the word "signed", because it is easy to over-claim. The SCP
+ * signature lives inside `scpValue.ext` and covers the **StellarValue**
+ * (txSetHash, closeTime, upgrades) — it does **not** cover `totalCoins`,
+ * `feePool` or `inflationSeq`. Those are derived state that every honest node
+ * computes identically from the previous header and the applied transaction
+ * set. So this decoder does not, and cannot, "verify a signature over the
+ * supply". What binds the bytes to the network is the SHA-256 hash chain in
+ * `examples/chain.mjs`: the ledger hash *is* sha256(header bytes), and each
+ * header commits to the previous one. See `docs/VERIFICATION.md` §2.
  *
  * Only the fields before `LedgerHeader.ext` are parsed, which is everything we
  * need. The reader is deliberately strict: a short or malformed buffer throws
@@ -115,7 +125,8 @@ export class XdrReader {
  *
  * @param {string} base64 the ledger's `header_xdr`
  * @returns {{
- *   ledgerVersion:number, ledgerSeq:number, totalCoins:bigint, feePool:bigint,
+ *   ledgerVersion:number, previousLedgerHash:string, ledgerSeq:number,
+ *   totalCoins:bigint, feePool:bigint,
  *   inflationSeq:number, idPool:bigint, baseFee:number, baseReserve:number,
  *   maxTxSetSize:number, scpCloseTime:bigint, scpUpgradeCount:number,
  *   bytesConsumed:number, totalBytes:number
@@ -131,7 +142,7 @@ export function decodeLedgerHeader(base64) {
   const r = new XdrReader(buf);
 
   const ledgerVersion = r.u32("ledgerVersion");
-  r.fixed(32, "previousLedgerHash");
+  const previousLedgerHash = r.fixed(32, "previousLedgerHash").toString("hex");
 
   // ---- StellarValue scpValue (variable length) ----
   r.fixed(32, "scpValue.txSetHash");
@@ -175,6 +186,7 @@ export function decodeLedgerHeader(base64) {
 
   return {
     ledgerVersion,
+    previousLedgerHash,
     ledgerSeq,
     totalCoins,
     feePool,

@@ -28,7 +28,7 @@ Two rules, applied without exception:
 | 1 | “Pi can mint unlimited coins — there is no real cap.” | The cap is official and on-chain; the issuance operation was removed before Pi’s genesis. | `FAQ-INFINITE-MINT.md` |
 | 2 | “All 100 billion were minted at genesis, so it is fake.” | Pi states it in its own words; pre-mint is an allocation, not recurring issuance. | `FAQ-PREMINTED-AT-GENESIS.md` |
 | 3 | “Only a fraction has migrated, so the 100 billion is fake.” | Total ≠ circulating. Pi names the live figure separately (Effective Total Supply). | `FAQ-TOTAL-VS-EFFECTIVE.md` |
-| 4 | “You are just trusting the API.” | The API’s summary is cross-checked against the raw consensus-signed header; a mismatch fails the run. | `FAQ-API-COULD-LIE.md` |
+| 4 | “You are just trusting the API.” | The raw header bytes are hashed and chained locally (`sha256(header)` = the ledger hash; adjacent headers linked); the JSON is only a cross-check. | `FAQ-API-COULD-LIE.md` |
 | 5 | “The fee pool keeps growing — that is inflation.” | `fee_pool` is a separate header field defined as fees paid; `total_coins` does not move. | `FAQ-FEE-POOL.md` |
 | 6 | “The Whitepaper says inflation may be needed later.” | Correct — and the claim is scoped to the observable present. Listed as falsifier F4. | `FAQ-FUTURE-INFLATION.md` |
 | 7 | “You cannot even see the first ledger.” | Correct. The lower bound is ledger 2, stated openly; ledger 1 returns `410`. | `FAQ-LEDGER-1-MISSING.md` |
@@ -72,6 +72,7 @@ of what does and does not count as a falsifier.
 
 ## 4. The one-line summary of the whole repository
 
-> **The total native supply is exactly 100,000,000,000 π on every ledger from 2 to the head, and no
-> operation in the current protocol increases it. Everything else — circulation, allocation, price,
-> consensus — is a different question, and this repository says which is which.**
+> **Every ledger header examined on Pi Mainnet reports 100,000,000,000 π, and the chain shows no
+> issuance operation — consistent with the documented protocol rule that removed native issuance before
+> Pi’s genesis. Everything else — circulation, allocation, price, consensus — is a different question,
+> and this repository says which is which.**

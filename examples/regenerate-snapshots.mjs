@@ -21,6 +21,7 @@ import { fileURLToPath } from "node:url";
 
 const JOBS = [
   ["xdr-header.mjs", [], "xdr-header-output.txt"],
+  ["hash-chain.mjs", ["--count", "12"], "hash-chain-output.txt"],
   ["supply-check.mjs", ["--samples", "40"], "supply-check-output.txt"],
   ["op-check.mjs", ["--ledgers", "12", "--per", "20"], "op-check-output.txt"],
   ["self-test.mjs", [], "self-test-output.txt"],

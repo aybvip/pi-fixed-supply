@@ -42,11 +42,11 @@ So:
 
 ## 2. What this repository claims, exactly
 
-> Pi’s **total** native supply is exactly 100,000,000,000 π on every observable ledger.
+> Pi’s **total** native supply is 100,000,000,000 π on **every ledger header examined**.
 
-That is a statement about **one header field**, and it is proven by measurement
-(`docs/VERIFICATION.md`). It is **not** a statement that 100 billion π are in circulation, spendable,
-unlocked, or held by anyone in particular.
+That is a statement about **one header field**, and it is a **measurement** (`docs/VERIFICATION.md`). It
+is **not** a statement that 100 billion π are in circulation, spendable, unlocked, or held by anyone in
+particular.
 
 If you want the circulating number, this repository is the wrong tool, and it says so in
 `docs/SCOPE.md` §4.

@@ -48,7 +48,7 @@ That gives two different questions that people routinely merge:
 
 | Question | Answer here |
 |---|---|
-| Does the total increase over time? | **No** — one number, unchanged on every observable ledger |
+| Does the total increase over time? | **No** — one number, unchanged on every ledger examined |
 | Does it *circulate*? | A **different** question, answered off-ledger — see `docs/FAQ-TOTAL-VS-EFFECTIVE.md` |
 
 ---

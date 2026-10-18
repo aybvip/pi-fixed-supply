@@ -2,7 +2,7 @@
 /**
  * xdr-header.mjs
  * ---------------------------------------------------------------------------
- * Reads the total supply **out of the raw, consensus-signed ledger header**
+ * Reads the total supply **out of the raw ledger header bytes**
  * instead of trusting the API's JSON summary.
  *
  * The API returns both `total_coins` (a convenience string) and `header_xdr`
@@ -104,7 +104,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("✅  The API's JSON matches the raw, consensus-signed header exactly.");
+  console.log("✅  The API's JSON matches the raw header bytes exactly.");
   const supplyOk = formatPi(h.totalCoins) === CAP_STRING;
   console.log(
     supplyOk

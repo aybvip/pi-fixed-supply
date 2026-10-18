@@ -25,30 +25,52 @@ is actually asserting, so you can judge the claim instead of trusting the green 
 | # | Layer | File | What it asserts | If it fails |
 |---|---|---|---|---|
 | 1 | **Formatting & units** | `examples/lib.mjs` | π ↔ stroops is exact integer arithmetic; 1 π = 10⁷ stroops; the cap is exactly 10¹⁸ stroops | The number you are comparing is wrong |
-| 2 | **XDR decoding** | `examples/xdr.mjs` | The raw consensus-signed header can be parsed to the exact offset, strictly, with no silent fallbacks | The header is not what this code thinks it is |
-| 3 | **Header truth** | `examples/xdr-header.mjs` | `totalCoins` read from raw XDR equals the API’s `total_coins`; `inflationSeq` = 0 | **A finding** — the API and the ledger disagree |
-| 4 | **Range sweep** | `examples/supply-check.mjs` | Every sampled ledger, from 2 to the head, has `total_coins` = the cap | Supply moved |
-| 5 | **Fee sink** | `examples/supply-check.mjs` | `fee_pool` grows across the range while `total_coins` does not | Fees are issuance (they are not) |
-| 6 | **Operation vocabulary** | `examples/op-check.mjs` | No observed operation type looks like issuance | A supply-creating operation exists |
-| 7 | **Failure paths** | `examples/self-test.mjs` | Network errors, timeouts, HTTP statuses, bad JSON and 429 backoff all surface correctly | Errors are being hidden |
-| 8 | **Live assertions** | `examples/self-test.mjs` | Head & genesis are at the cap; header decodes; `inflationSeq` = 0 | The chain moved |
+| 2 | **XDR decoding** | `examples/xdr.mjs` | The raw header bytes can be parsed to the exact offset, strictly, with no silent fallbacks | The header is not what this code thinks it is |
+| 3 | **Hash binding** | `examples/chain.mjs` | `sha256(header bytes)` equals the ledger hash, and adjacent headers chain by SHA-256 — checked locally, with no value the API computed | **A finding** — the bytes are not the ones the chain commits to |
+| 4 | **Header truth** | `examples/xdr-header.mjs` | `totalCoins` read from raw XDR equals the API’s `total_coins`; `inflationSeq` = 0 | **A finding** — the API and the ledger disagree |
+| 5 | **Range sweep** | `examples/supply-check.mjs` | Every sampled ledger, from 2 to the head, has `total_coins` = the cap | Supply moved |
+| 6 | **Fee sink** | `examples/supply-check.mjs` | `fee_pool` grows across the range while `total_coins` does not | Fees are issuance (they are not) |
+| 7 | **Operation vocabulary** | `examples/op-check.mjs` | No observed operation type looks like issuance | A supply-creating operation exists |
+| 8 | **Failure paths** | `examples/self-test.mjs` | Network errors, timeouts, HTTP statuses, bad JSON and 429 backoff all surface correctly | Errors are being hidden |
+| 9 | **Live assertions** | `examples/self-test.mjs` | Head & genesis are at the cap; header decodes; `inflationSeq` = 0; head hash = `sha256(header)`; consecutive headers link | The chain moved |
 
 ---
 
-## 2. Why the XDR reader matters
+## 2. Why the raw bytes matter — and what “signed” does *not* mean
 
 The API is a convenience layer. It hands you `total_coins` as a **string it produced**. If you only read
 that, you are trusting the API.
 
-The same response also carries `header_xdr` — the actual consensus-signed header, base64-encoded.
-`examples/xdr.mjs` decodes it directly, and `examples/xdr-header.mjs` refuses to pass unless the decoded
+The same response also carries `header_xdr` — the ledger header as **raw bytes**, base64-encoded. Two
+checks run on those bytes, and **neither uses a number the API computed**:
+
+**Hash binding.** In the Stellar protocol the ledger hash *is* `sha256(serialised LedgerHeader)`.
+`examples/chain.mjs` recomputes it with `node:crypto` and compares it against the ledger hash the API
+reports; and because each header stores the previous ledger’s hash, adjacent headers form a chain that
+is verified link by link:
+
+```
+    ledger      sha256(header)==hash   totalCoins
+    29284694    ✓                    ✓ 100000000000.0000000
+    …
+    11/11 links verified
+```
+
+**The word “signed”, stated exactly.** It is tempting to call this a “consensus-signed header” and stop
+there. That over-claims. The SCP signature inside the header covers the **`StellarValue`** (`txSetHash`,
+`closeTime`, the upgrade votes) — **not** `totalCoins`, `feePool` or `inflationSeq`. Those are derived
+state, computed identically by every honest node. This repository does **not** verify the SCP signature,
+and the supply number is not under it. What binds the bytes to the network is the **SHA-256 hash
+chain**, not a signature over the supply.
+
+**Cross-check.** `examples/xdr-header.mjs` decodes the raw header and refuses to pass unless the decoded
 `totalCoins` equals the API’s `total_coins`, field for field:
 
 ```
   cross-check: raw XDR  vs  the API's JSON
-    ✓ ledgerSeq      xdr=29284238  json=29284238
+    ✓ ledgerSeq      xdr=29284883  json=29284883
     ✓ totalCoins     xdr=100000000000.0000000  json=100000000000.0000000
-    ✓ feePool        xdr=11780946.8629664  json=11780946.8629664
+    ✓ feePool        xdr=11781341.4931664  json=11781341.4931664
     ✓ maxTxSetSize   xdr=1000  json=1000
     ✓ baseFee        xdr=100000  json=100000
     ✓ baseReserve    xdr=4900000  json=4900000
@@ -69,13 +91,13 @@ A fair question about a sweep that reports “nothing changed” is whether it w
 at all. It would: the same decode shows that **other fields in the very same header moved** between
 genesis and the head, while `totalCoins` did not.
 
-| Header field | Ledger **2** (2020-12-31, genesis) | Ledger **29,284,238** (2026-10-18, head) | Changed? |
+| Header field | Ledger **2** (2020-12-31, genesis) | Ledger **29,284,883** (2026-10-18, head) | Changed? |
 |---|---|---|---|
 | `baseFee` | `100` | `100000` | ✅ changed |
 | `baseReserve` | `100000000` | `4900000` | ✅ changed |
 | `maxTxSetSize` | `100` | `1000` | ✅ changed |
 | `ledgerVersion` | `0` | `28` | ✅ changed |
-| `feePool` | `0` | `11780946.8629664` | ✅ growing |
+| `feePool` | `0` | `11781341.4931664` | ✅ growing |
 | **`totalCoins`** | **`100000000000.0000000`** | **`100000000000.0000000`** | ❌ **constant** |
 | **`inflationSeq`** | **`0`** | **`0`** | ❌ **constant** |
 
@@ -117,6 +139,7 @@ node examples/regenerate-snapshots.mjs
 | Snapshot | Generated by |
 |---|---|
 | `examples/xdr-header-output.txt` | `node examples/xdr-header.mjs` |
+| `examples/hash-chain-output.txt` | `node examples/hash-chain.mjs --count 12` |
 | `examples/supply-check-output.txt` | `node examples/supply-check.mjs --samples 40` |
 | `examples/op-check-output.txt` | `node examples/op-check.mjs --ledgers 12 --per 20` |
 | `examples/self-test-output.txt` | `node examples/self-test.mjs` |
@@ -132,10 +155,12 @@ expected: the **claimed property** is what must be stable, not the ledger number
 
 - **offline** — the π/stroops formatting, input validation, the sampling function, `mapLimit`, every XDR
   primitive, the full header decode (including a synthetic *signed* `StellarValue` and a truncated
-  buffer), and every documented failure path of the HTTP client (network error, timeout, `410`, invalid
-  JSON, `429` retry, exhausted retries).
+  buffer), the SHA-256 chain checks (a known-vector hash, a well-linked pair, and both a tampered hash
+  and a broken link correctly rejected), and every documented failure path of the HTTP client (network
+  error, timeout, `410`, invalid JSON, `429` retry, exhausted retries).
 - **online** — the head and genesis are at the cap, the raw header decodes and agrees, `inflationSeq`
-  is 0, and ledger 1 is genuinely not served.
+  is 0, `sha256(header)` equals the head’s ledger hash, consecutive headers link by SHA-256, and ledger
+  1 is genuinely not served.
 
 Run it without a network to see the offline half alone:
 
@@ -155,4 +180,4 @@ Stated so that a green run is not read as more than it is:
 | That circulating supply equals any particular number | Claim C — out of scope |
 | That the base reserve / base fee fields have a particular meaning in π | They are decoded and cross-checked against the API; their interpretation is not used by any check |
 | That no future protocol can change the supply | Explicitly open — `docs/FAQ-FUTURE-INFLATION.md` |
-| That the API is honest | Not needed: the raw header is decoded, and a disagreement fails the run |
+| That the node you query is honest | Not asserted. The raw bytes are hashed and chained locally, so a *fabricated* header must come with a fabricated chain — but the anchor hash must come from somewhere you trust (`docs/THREAT-MODEL.md` §4) |
