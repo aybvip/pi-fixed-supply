@@ -285,3 +285,14 @@ remain the property of their authors.
 
 **Not financial advice.** This repository makes no claim about price, value, or merit, and is not
 affiliated with Pi Network or the Stellar Development Foundation. See [`DISCLAIMER.md`](DISCLAIMER.md).
+
+---
+
+## See also
+
+| Repository | What it proves / analyses |
+|---|---|
+| [**pi-fungibility**](https://github.com/aybvip/pi-fungibility) | π ≡ π — mined Pi and exchange Pi are the same native asset on-chain |
+| [**pi-ecosystem-mcap**](https://github.com/aybvip/pi-ecosystem-mcap) | Ecosystem market-cap mechanics: PiDEX, OUSD, CiDi Games, PiRC Launchpad — confirmed vs speculation |
+
+These three repositories form a complementary set: supply is fixed, the asset is fungible, and the ecosystem market mechanics are analysed honestly.
